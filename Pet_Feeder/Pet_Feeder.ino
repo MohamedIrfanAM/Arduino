@@ -9,13 +9,12 @@ Servo feedingServo;
 
 // Global Variables
 int startingAngle = 0;    
-int feedRate = 70;
-int thresholdSound = 900;
-unsigned long maxTime = 300000;
+int feedRate = 75;
+int thresholdSound = 600;
+unsigned long maxTime = 120000;
 int servoPin = 9;
-int ledPin = 7;
-int buzzerPin = 8;
-#define micPin A0
+int frightenPin = 2;
+#define micPin A7
 
 void feed()
 {
@@ -24,7 +23,7 @@ void feed()
     feedingServo.write(startingAngle);            
     delay(1);                       
   }
-  delay(10);
+  delay(100);
   for (startingAngle = feedRate; startingAngle >= 0; startingAngle -= 1) 
   { 
     feedingServo.write(startingAngle);              
@@ -34,40 +33,31 @@ void feed()
 unsigned long previousTime = 0;
 void frighten()
 {
-  digitalWrite(ledPin,HIGH);
-  digitalWrite(buzzerPin,HIGH);
+  digitalWrite(frightenPin,HIGH);
 }
 
 void unFrighten()
 {
-  digitalWrite(ledPin,LOW);
-  digitalWrite(buzzerPin,LOW);
+  digitalWrite(frightenPin,LOW);
 }
 
 void setup() 
 {
   feedingServo.attach(servoPin);
   feedingServo.write(0);
-  pinMode(ledPin,OUTPUT); 
-  pinMode(buzzerPin,OUTPUT); 
+  pinMode(frightenPin,OUTPUT); 
   
-  Serial.begin(9600);
 }
 
 void loop() 
 {
-  
   while((analogRead(micPin)) > thresholdSound)
   {
-//    Serial.println("High Sound");
-//    Serial.print(analogRead(micPin)*50);
     previousTime = millis();
     frighten();
-    delay(1500);
+    delay(3000);
     if((analogRead(micPin)) < thresholdSound)
     {
-//      Serial.println("Low Sound");
-//      Serial.print(analogRead(micPin)*50);
       unFrighten();
       break;
     }
@@ -80,5 +70,4 @@ void loop()
     previousTime = millis();
     feed();
   }
-  //Serial.println(currentTime-previousTime);
 }
