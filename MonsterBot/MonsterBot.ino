@@ -7,7 +7,7 @@ const int rearmotor1 = 8;
 const int rearmotor2 = 9;
 const int headlight = 6;
 
-bool fwdstate = false;
+// bool fwdstate = false;
 
 int value = 0;
 
@@ -32,7 +32,7 @@ void setup()
   brake();
   straight();
   digitalWrite(headlight, LOW);
-  fwdstate = false;
+  // fwdstate = false;
   Serial.begin(9600);
 }
 
@@ -73,22 +73,22 @@ void loop()
     straight();
   }
 
-// FourWheel Drive
-  if(value == 57)
-  {
-    fwdstate = true;
-  }
-  else if(value == 56)
-  {
-    fwdstate = false;
-  }
+// // FourWheel Drive
+//   if(value == 57)
+//   {
+//     fwdstate = true;
+//   }
+//   else if(value == 56)
+//   {
+//     fwdstate = false;
+//   }
 
 // Headlight
-  if(value == 59)
+  if(value == 57)
   {
     digitalWrite(headlight, HIGH);
   }
-  else if(value == 58)
+  else if(value == 56)
   {
     digitalWrite(headlight, LOW);
   }
@@ -116,32 +116,15 @@ void forward()
 {  
   digitalWrite(rearmotor1,LOW);
   digitalWrite(rearmotor2,HIGH);
-
-  if(fwdstate)
-  {
   digitalWrite(frontmotor1,LOW);
   digitalWrite(frontmotor2,HIGH);
-  }
-  else 
-  {
-  digitalWrite(frontmotor1,LOW);
-  digitalWrite(frontmotor2,LOW);
-  }
 }
 void reverse()
 {  
   digitalWrite(rearmotor1,HIGH);
   digitalWrite(rearmotor2,LOW);
-  if(fwdstate)
-  {
   digitalWrite(frontmotor1,HIGH);
   digitalWrite(frontmotor2,LOW);
-  }
-  else 
-  {
-  digitalWrite(frontmotor1,LOW);
-  digitalWrite(frontmotor2,LOW);
-  }
 }
 void brake()
 {  
