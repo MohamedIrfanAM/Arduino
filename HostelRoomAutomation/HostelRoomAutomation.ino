@@ -307,6 +307,7 @@ void ARDUINO_ISR_ATTR isr(void *arg)
 }
 
 void setup() {
+
   Serial.begin(115200);
 
   if (!EEPROM.begin(512))
@@ -353,7 +354,7 @@ void setup() {
   pinMode(SWITCH, INPUT);
   pinMode(BUZZER, OUTPUT);
   digitalWrite(RELAY, DEFAULT_RELAY_MODE);
-
+  // digitalWrite(BUZZER, HIGH);
   Serial.println("Put your card to the reader...");
   Serial.println();
 
@@ -606,7 +607,7 @@ void success_buzzer()
   if (buzz == true)
   {
     digitalWrite(BUZZER, HIGH);
-    delay(2000);
+    delay(4000);
     digitalWrite(BUZZER, LOW);
   }
 }
@@ -615,12 +616,12 @@ void Failure_buzzer()
 {
   if (buzz == true)
   {
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 5; i++)
     {
       digitalWrite(BUZZER, HIGH);
-      delay(100);
+      delay(300);
       digitalWrite(BUZZER, LOW);
-      delay(50);
+      delay(150);
     }
   }
 }
@@ -630,7 +631,7 @@ void beep()
   if (buzz == true)
   {
     digitalWrite(BUZZER, HIGH);
-    delay(100);
+    delay(300);
     digitalWrite(BUZZER, LOW);
   }
 }
