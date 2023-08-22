@@ -452,7 +452,7 @@ void loop()
     str[i] = s1[i];
   }
 
-  my_lock.updateAndReportParam("display", str);
+  // my_lock.updateAndReportParam("display", str);
 
   if (strstr(str, "Access Denied"))
   {
@@ -584,6 +584,7 @@ String compareUID(String str)
   }
   else   {
     Serial.println(" Access denied");
+    my_lock.updateAndReportParam("display", "Access denied");
     digitalWrite(RELAY, HIGH);
     Failure_buzzer();
     return "Access Denied";
