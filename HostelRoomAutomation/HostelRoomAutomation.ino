@@ -6,9 +6,10 @@
 #include <EEPROM.h>
 #include <MFRC522.h>
 #include <SPI.h>
+#include <Servo.h>
 
 // SET DEFAULTS
-#define DEFAULT_RELAY_MODE true
+// #define DEFAULT_RELAY_MODE true
 #define DEFAULT_POWER_MODE false
 //BLE CREDENTIALS
 const char *service_name = "PROV_QUANTUM101";
@@ -20,7 +21,7 @@ static uint8_t SS_PIN = 5;
 static uint8_t RST_PIN = 22;
 // static uint8_t Internet_LED = 14;
 static uint8_t Read_Mode_LED = 13;
-static uint8_t RELAY = 15;
+static uint8_t SERVO = 15;
 static uint8_t SWITCH = 25;
 static uint8_t BUZZER = 26;
 // GPIO for switch
@@ -33,22 +34,22 @@ static uint8_t gpio_relay2 = 14;
 static uint8_t gpio_led = 13;
 
 /* Variable for reading pin status*/
-bool switch_state_ch1 = true;
-bool switch_state_ch2 = true;
+bool switch_state_ch1 = false;
+bool switch_state_ch2 = false;
 bool relay_state = false;
 bool wifi_connected = 0;
 bool add_button = false;
 bool remove_button = false;
 int SWITCH_STATE = HIGH;
 int address;
-bool buzzer_state = false;
+bool buzzer_state = true;
 bool buzz = false;
 
 struct LightSwitch {
     const uint8_t pin;
     bool pressed;
 };
-
+Servo servo1;
 // Define the light switches for channel 1 and 2
 LightSwitch switch_ch1 = {gpio_switch1, false};
 LightSwitch switch_ch2 = {gpio_switch2, false};
@@ -142,7 +143,7 @@ void write_callback(Device *device, Param *param, const param_val_t val, void *p
     {
       Serial.printf("Door %s", val.val.b ? "OPEN" : "CLOSED");
       relay_state = val.val.b;
-      (relay_state == false) ? digitalWrite(RELAY, HIGH) : digitalWrite(RELAY, LOW);
+      (relay_state == false) ? closeDoor() : openDoor();
       param->updateAndReport(val);
     }
 
@@ -309,6 +310,7 @@ void ARDUINO_ISR_ATTR isr(void *arg)
 void setup() {
 
   Serial.begin(115200);
+  servo1.attach(SERVO);
 
   if (!EEPROM.begin(512))
   {
@@ -350,10 +352,11 @@ void setup() {
   // pinMode(Internet_LED, OUTPUT);
 
   pinMode(gpio_reset , INPUT);
-  pinMode(RELAY, OUTPUT);
+  // pinMode(SERVO, OUTPUT);
   pinMode(SWITCH, INPUT);
   pinMode(BUZZER, OUTPUT);
-  digitalWrite(RELAY, DEFAULT_RELAY_MODE);
+  servo1.write(160);
+  // digitalWrite(RELAY, DEFAULT_RELAY_MODE);
   // digitalWrite(BUZZER, HIGH);
   Serial.println("Put your card to the reader...");
   Serial.println();
@@ -510,6 +513,21 @@ String getValueFromRfid()
   return val;
 }
 
+void closeDoor(){
+  for(int posDegrees = 160; posDegrees >= 0; posDegrees-=10) {
+      servo1.write(posDegrees);
+      delay(20);
+  }
+  delay(3000);
+}
+
+void openDoor(){
+  for(int posDegrees = 0; posDegrees <= 160; posDegrees+=10) {
+    servo1.write(posDegrees);
+    delay(20);
+  }
+  delay(3000);
+}
 
 void add_switch_off(void)
 {
@@ -532,10 +550,15 @@ String authorized_access(void)
   Serial.println();
   my_lock.updateAndReportParam("display", "Access Authorized");
   beep();
-  digitalWrite(RELAY, LOW);
-  delay(5000);
-  digitalWrite(RELAY, HIGH);
-
+  // (relay_state == false) ? closeDoor() : openDoor();
+  if(relay_state){
+    openDoor();
+    relay_state = false;
+  }
+  else{
+    closeDoor();
+    relay_state = true;
+  }
   return "Access Authorized";
 }
 
@@ -586,7 +609,7 @@ String compareUID(String str)
   else   {
     Serial.println(" Access denied");
     my_lock.updateAndReportParam("display", "Access denied");
-    digitalWrite(RELAY, HIGH);
+    // closeDoor();
     Failure_buzzer();
     return "Access Denied";
   }
@@ -595,9 +618,7 @@ String compareUID(String str)
 void authorized_access_offline()
 {
   Serial.println("Authorized access");
-  digitalWrite(RELAY, LOW);
-  delay(5000);
-  digitalWrite(RELAY, HIGH);
+  (relay_state == false) ? closeDoor() : openDoor();
 }
 
 //---------------------------- Different Buzzer Patterns
