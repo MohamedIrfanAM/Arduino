@@ -86,7 +86,7 @@ void sysProvEvent(arduino_event_t *sys_event)
     case ARDUINO_EVENT_WIFI_STA_CONNECTED:
       Serial.printf("\nConnected to Wi-Fi!\n");
       // digitalWrite(Internet_LED, HIGH);
-      //wifi_connected = 1;
+      //wifi_connected = 1
       delay(500);
       break;
     case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
@@ -338,7 +338,7 @@ void setup() {
     digitalWrite(gpio_relay2, DEFAULT_POWER_MODE);
     digitalWrite(gpio_led, false);
     //Initialize switch device
-    my_switch1 = new Switch("Light", &gpio_relay1);
+    my_switch1 = new Switch("Light", &gpio_relay1); 
     my_switch2 = new Switch("Fan", &gpio_relay2);
     if (!my_switch1 || !my_switch2) {
         return;
@@ -355,6 +355,7 @@ void setup() {
   // pinMode(SERVO, OUTPUT);
   pinMode(SWITCH, INPUT);
   pinMode(BUZZER, OUTPUT);
+  digitalWrite(BUZZER,HIGH);
   servo1.write(160);
   // digitalWrite(RELAY, DEFAULT_RELAY_MODE);
   // digitalWrite(BUZZER, HIGH);
@@ -419,6 +420,10 @@ void setup() {
 
 void loop()
 {
+  // digitalWrite(BUZZER,LOW);
+  // delay(4000);
+  // digitalWrite(BUZZER,HIGH);
+  // delay(4000);
   //---------------------------------- Exit Switch
 
   // SWITCH_STATE = digitalRead(SWITCH);
@@ -518,7 +523,6 @@ void closeDoor(){
       servo1.write(posDegrees);
       delay(20);
   }
-  delay(3000);
 }
 
 void openDoor(){
@@ -526,7 +530,6 @@ void openDoor(){
     servo1.write(posDegrees);
     delay(20);
   }
-  delay(3000);
 }
 
 void add_switch_off(void)
@@ -549,8 +552,7 @@ String authorized_access(void)
   Serial.println("Authorized access");
   Serial.println();
   my_lock.updateAndReportParam("display", "Access Authorized");
-  beep();
-  // (relay_state == false) ? closeDoor() : openDoor();
+  digitalWrite(BUZZER, LOW);
   if(relay_state){
     openDoor();
     relay_state = false;
@@ -559,6 +561,8 @@ String authorized_access(void)
     closeDoor();
     relay_state = true;
   }
+  delay(2000);
+  digitalWrite(BUZZER, HIGH);
   return "Access Authorized";
 }
 
@@ -627,9 +631,9 @@ void success_buzzer()
 {
   if (buzz == true)
   {
-    digitalWrite(BUZZER, HIGH);
-    delay(4000);
     digitalWrite(BUZZER, LOW);
+    delay(2000);
+    digitalWrite(BUZZER, HIGH);
   }
 }
 
@@ -639,9 +643,9 @@ void Failure_buzzer()
   {
     for (int i = 0; i < 5; i++)
     {
-      digitalWrite(BUZZER, HIGH);
-      delay(300);
       digitalWrite(BUZZER, LOW);
+      delay(300);
+      digitalWrite(BUZZER, HIGH);
       delay(150);
     }
   }
@@ -651,8 +655,8 @@ void beep()
 {
   if (buzz == true)
   {
-    digitalWrite(BUZZER, HIGH);
-    delay(300);
     digitalWrite(BUZZER, LOW);
+    delay(300);
+    digitalWrite(BUZZER, HIGH);
   }
 }
